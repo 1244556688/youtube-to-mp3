@@ -3,12 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>UIUX Music Player</title>
+<title>UIUX Music Landing</title>
 
 <style>
 :root{
   --bg:#07060b;
-  --panel:#0f1116;
   --accent1:#7C5CFF;
   --accent2:#00E5A8;
   --glass:rgba(255,255,255,0.06);
@@ -26,175 +25,209 @@ body{
     radial-gradient(1000px 700px at 90% 90%, rgba(0,229,168,.06), transparent 40%),
     var(--bg);
   color:#e9eef8;
-  display:flex;
-  align-items:center;
-  justify-content:center;
   overflow:hidden;
 }
 
-/* ===== 主卡片 ===== */
-.player-wrap{
-  width:520px;
-  height:340px;
-  perspective:1200px;
+/* ===== Header ===== */
+header{
+  display:flex;
+  align-items:center;
+  padding:20px 36px;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo .mark{
+  width:44px;height:44px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--accent1),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;color:#04101a;
 }
 
+/* ===== Hero ===== */
+.hero{
+  display:grid;
+  grid-template-columns:1fr 560px;
+  align-items:center;
+  padding:40px;
+  height:calc(100vh - 84px);
+}
+
+/* 左側文案 */
+.hero-left h1{
+  font-size:48px;
+  margin:0;
+  background:linear-gradient(90deg,#fff,#dbe7ff);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+.hero-left p{
+  color:rgba(255,255,255,.7);
+  max-width:520px;
+}
+.cta{
+  margin-top:24px;
+  padding:16px 24px;
+  border-radius:14px;
+  border:0;
+  font-weight:800;
+  cursor:pointer;
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  color:#04101a;
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+}
+
+/* ===== 播放器卡片 ===== */
+.player-wrap{
+  perspective:1200px;
+}
 .player{
-  width:100%;
-  height:100%;
+  width:520px;
+  height:340px;
   border-radius:20px;
   background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
   border:1px solid var(--glass-2);
   box-shadow:0 30px 90px rgba(0,0,0,.75);
   backdrop-filter:blur(12px);
   padding:24px;
-  transform-style:preserve-3d;
-  transition:transform .6s cubic-bezier(.16,.9,.32,1);
   position:relative;
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.16,.9,.32,1);
 }
 
-/* ===== 封面 ===== */
+/* 光束 */
+.beam{
+  position:absolute;
+  left:50%;top:18%;
+  width:6px;height:220px;
+  transform:translateX(-50%);
+  background:linear-gradient(180deg,#fff,transparent);
+  filter:blur(18px);
+  opacity:.7;
+  animation:pulse 2.2s infinite;
+}
+@keyframes pulse{
+  0%{opacity:.3;transform:translateX(-50%) scaleY(.7)}
+  50%{opacity:.9;transform:translateX(-50%) scaleY(1.1)}
+  100%{opacity:.3;transform:translateX(-50%) scaleY(.7)}
+}
+
+/* 封面 */
 .cover{
-  width:120px;
-  height:120px;
+  width:120px;height:120px;
   border-radius:14px;
   background:linear-gradient(135deg,var(--accent1),var(--accent2));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:40px;
-  font-weight:900;
-  color:#04101a;
-  box-shadow:0 16px 40px rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:40px;font-weight:900;color:#04101a;
 }
 
-/* ===== 歌曲資訊 ===== */
-.info{
-  margin-left:20px;
-  flex:1;
-}
-.title{
-  font-size:20px;
-  font-weight:800;
-}
-.artist{
-  font-size:14px;
-  color:rgba(255,255,255,.65);
-  margin-top:6px;
-}
-
-/* ===== 上排 ===== */
+/* 頂部 */
 .top{
   display:flex;
-  align-items:center;
+  gap:20px;
 }
 
-/* ===== 進度條 ===== */
-.progress-wrap{
-  margin-top:28px;
-}
-.bar{
-  height:6px;
-  background:rgba(255,255,255,.08);
-  border-radius:999px;
-  overflow:hidden;
-  cursor:pointer;
-}
-.bar span{
-  display:block;
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+/* 頻譜 */
+canvas{
+  width:100%;
+  height:80px;
+  margin-top:20px;
 }
 
-/* ===== 控制列 ===== */
+/* 控制 */
 .controls{
-  margin-top:22px;
+  margin-top:18px;
   display:flex;
-  align-items:center;
   justify-content:center;
-  gap:24px;
+  gap:22px;
 }
-
 .btn{
-  width:54px;
-  height:54px;
+  width:54px;height:54px;
   border-radius:50%;
   border:0;
   background:var(--glass);
   color:white;
   font-size:20px;
   cursor:pointer;
-  box-shadow:0 12px 30px rgba(0,0,0,.5);
 }
 .btn.play{
   background:linear-gradient(135deg,var(--accent1),var(--accent2));
   color:#04101a;
-  font-size:22px;
-}
-
-/* ===== 光束動畫 ===== */
-.beam{
-  position:absolute;
-  left:50%;
-  top:18%;
-  width:6px;
-  height:220px;
-  transform:translateX(-50%);
-  background:linear-gradient(180deg,#fff,transparent);
-  filter:blur(18px);
-  opacity:.6;
-  animation:pulse 2.4s infinite;
-  pointer-events:none;
-}
-
-@keyframes pulse{
-  0%{opacity:.3;transform:translateX(-50%) scaleY(.7)}
-  50%{opacity:.9;transform:translateX(-50%) scaleY(1.1)}
-  100%{opacity:.3;transform:translateX(-50%) scaleY(.7)}
 }
 </style>
 </head>
 
 <body>
 
-<div class="player-wrap">
-  <div class="player" id="card">
-    <div class="beam"></div>
-
-    <div class="top">
-      <div class="cover">♪</div>
-      <div class="info">
-        <div class="title">UIUX Demo Track</div>
-        <div class="artist">Glass Motion Studio</div>
-      </div>
+<header>
+  <div class="logo">
+    <div class="mark">UX</div>
+    <div>
+      <div style="font-weight:800">Music UIUX</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5)">Landing Demo</div>
     </div>
-
-    <div class="progress-wrap">
-      <div class="bar" id="bar">
-        <span id="progress"></span>
-      </div>
-    </div>
-
-    <div class="controls">
-      <button class="btn">⏮</button>
-      <button class="btn play" id="play">▶</button>
-      <button class="btn">⏭</button>
-    </div>
-
-    <audio id="audio" src="為自己吶喊.mp3"></audio>
   </div>
-</div>
+</header>
+
+<section class="hero">
+  <div class="hero-left">
+    <h1>音樂 × UIUX<br>沉浸式首頁體驗</h1>
+    <p>結合高質感視覺、音樂頻譜與微互動，打造真正有記憶點的 Landing Page。</p>
+    <button class="cta">立即體驗</button>
+  </div>
+
+  <div class="player-wrap">
+    <div class="player" id="player">
+      <div class="beam"></div>
+
+      <div class="top">
+        <div class="cover">♪</div>
+        <div>
+          <div style="font-weight:800;font-size:18px">UIUX Demo Track</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.6)">Glass Motion</div>
+        </div>
+      </div>
+
+      <canvas id="visualizer"></canvas>
+
+      <div class="controls">
+        <button class="btn">⏮</button>
+        <button class="btn play" id="play">▶</button>
+        <button class="btn">⏭</button>
+      </div>
+
+      <audio id="audio" src="為自己吶喊.mp3"></audio>
+    </div>
+  </div>
+</section>
 
 <script>
-const card = document.getElementById('card');
+/* ===== 播放 + 頻譜 ===== */
 const audio = document.getElementById('audio');
 const playBtn = document.getElementById('play');
-const progress = document.getElementById('progress');
-const bar = document.getElementById('bar');
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext('2d');
 
-/* 播放 */
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
+
+let audioCtx, analyser, dataArray;
+
 playBtn.onclick = () => {
+  if(!audioCtx){
+    audioCtx = new AudioContext();
+    analyser = audioCtx.createAnalyser();
+    const src = audioCtx.createMediaElementSource(audio);
+    src.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    analyser.fftSize = 64;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    draw();
+  }
+
   if(audio.paused){
     audio.play();
     playBtn.textContent = '⏸';
@@ -204,22 +237,29 @@ playBtn.onclick = () => {
   }
 };
 
-/* 進度 */
-audio.addEventListener('timeupdate',()=>{
-  progress.style.width = (audio.currentTime / audio.duration * 100) + '%';
-});
+function draw(){
+  requestAnimationFrame(draw);
+  analyser.getByteFrequencyData(dataArray);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-/* 點擊拖曳 */
-bar.onclick = e=>{
-  const p = e.offsetX / bar.clientWidth;
-  audio.currentTime = p * audio.duration;
-};
+  const barWidth = canvas.width / dataArray.length;
+  dataArray.forEach((v,i)=>{
+    const h = v / 255 * canvas.height;
+    const x = i * barWidth;
+    ctx.fillStyle = `linear-gradient`;
+    ctx.fillStyle = i % 2
+      ? '#7C5CFF'
+      : '#00E5A8';
+    ctx.fillRect(x, canvas.height - h, barWidth * .7, h);
+  });
+}
 
-/* 微視差 */
+/* ===== 視差 ===== */
+const player = document.getElementById('player');
 window.addEventListener('mousemove',e=>{
   const x = (e.clientX / window.innerWidth - .5) * 12;
   const y = (e.clientY / window.innerHeight - .5) * -12;
-  card.style.transform = `rotateX(${y}deg) rotateY(${x}deg)`;
+  player.style.transform = `rotateX(${y}deg) rotateY(${x}deg)`;
 });
 </script>
 
