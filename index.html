@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>UIUX Demo — Animated Landing</title>
+  <style>
+    :root{
+      --bg:#07060b;
+      --panel:#0f1116;
+      --accent1: #7C5CFF; /* 紫 */
+      --accent2: #00E5A8; /* 綠 */
+      --glass: rgba(255,255,255,0.06);
+      --glass-2: rgba(255,255,255,0.03);
+      --light: rgba(124,92,255,0.18);
+      --gold: #ffcf46;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, "Helvetica Neue", Helvetica, Arial;
+      background: radial-gradient(1200px 800px at 10% 10%, rgba(124,92,255,0.06), transparent 6%),
+                  radial-gradient(1000px 700px at 90% 90%, rgba(0,229,168,0.04), transparent 6%),
+                  var(--bg);
+      color:#e9eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x:hidden;
+    }
+
+    /* layout */
+    .wrap{
+      min-height:100vh;
+      display:grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header{
+      padding:18px 28px;
+      display:flex;
+      gap:16px;
+      align-items:center;
+    }
+    .logo{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo .mark{
+      width:44px;height:44px;border-radius:10px;
+      background: linear-gradient(135deg,var(--accent1),var(--accent2));
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;color:#051018;
+      box-shadow:0 6px 20px rgba(0,0,0,0.6), 0 0 24px var(--light);
+    }
+    .nav{
+      margin-left:auto;
+      display:flex;
+      gap:16px;
+      align-items:center;
+      opacity:0.9;
+    }
+    .nav a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:14px;}
+
+    /* hero */
+    .hero{
+      display:grid;
+      grid-template-columns: 1fr 560px;
+      gap:36px;
+      align-items:center;
+      padding:36px;
+    }
+
+    .hero-left{
+      max-width:780px;
+      padding:36px;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      font-size:13px;
+      color: #bcd6ff;
+      background: linear-gradient(90deg, rgba(124,92,255,0.12), rgba(0,229,168,0.06));
+      padding:8px 12px;border-radius:999px;
+      margin-bottom:18px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.4);
+    }
+
+    h1{
+      margin:0 0 12px 0;
+      font-size:44px;line-height:1.02;
+      letter-spacing:-0.02em;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      background: linear-gradient(90deg,#fff 0%, #d8e6ff 40%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    p.lead{color:rgba(255,255,255,0.72);font-size:16px;margin:10px 0 22px 0;max-width:60%}
+
+    .ctas{display:flex;gap:14px;align-items:center}
+    .btn{
+      padding:14px 20px;border-radius:12px;border:0;font-weight:700;cursor:pointer;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 8px 30px rgba(2,6,23,0.5);
+    }
+    .btn-primary{
+      background: linear-gradient(90deg,var(--accent1),var(--accent2));
+      color:#04101a;
+      transform: translateY(0);
+      transition: transform .18s ease;
+    }
+    .btn-primary:active{transform: translateY(2px);}
+
+    .btn-ghost{
+      background:transparent;border:1px solid rgba(255,255,255,0.06);
+      color:rgba(255,255,255,0.9);
+    }
+
+    /* hero-right - mockup */
+    .mockup{
+      position:relative;
+      width:100%;
+      height:420px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      perspective:1200px;
+    }
+
+    .device{
+      width:520px;height:320px;border-radius:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 24px 80px rgba(2,6,23,0.7);
+      transform-style:preserve-3d;
+      position:relative;
+      overflow:hidden;
+      transition: transform .6s cubic-bezier(.16,.9,.32,1);
+    }
+
+    /* tilt on mouse */
+    .device.tilt{
+      transform: rotateX(6deg) rotateY(-6deg) translateZ(6px);
+    }
+
+    /* "screen" content */
+    .screen{
+      position:absolute;inset:18px;border-radius:10px;overflow:hidden;
+      background:linear-gradient(180deg,#05050a, #0b0b10);
+      display:flex;flex-direction:column;justify-content:space-between;
+      padding:18px;
+    }
+
+    /* dynamic beam */
+    .beam{
+      position:absolute;left:50%;top:20%;
+      width:6px;height:220px;
+      transform:translateX(-50%) rotate(0.001deg);
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(124,92,255,0.02));
+      filter: blur(18px);
+      mix-blend-mode:screen;
+      animation: pulse 2.2s ease-in-out infinite;
+      opacity:0.95;
+      border-radius:999px;
+    }
+    @keyframes pulse{
+      0%{transform:translateX(-50%) scaleY(0.6);opacity:.5}
+      50%{transform:translateX(-50%) scaleY(1.15);opacity:1}
+      100%{transform:translateX(-50%) scaleY(0.6);opacity:.5}
+    }
+
+    /* moving lines (simulate 3D track) */
+    .track{
+      position:absolute;left:0;right:0;bottom:24px;height:120px;overflow:hidden;
+      transform:translateZ(20px);
+    }
+    .track .line{
+      position:absolute;left:50%;width:1600px;height:2px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+      top:10px;transform-origin:center;
+      animation: moveLines 2.6s linear infinite;
+    }
+    .track .line.l2{top:40px;animation-duration:3.2s;opacity:0.9}
+    .track .line.l3{top:70px;animation-duration:2.2s;opacity:0.7}
+    @keyframes moveLines{
+      from{transform:translateX(-50%) translateY(0) scaleX(1)}
+      to{transform:translateX(-50%) translateY(-200px) scaleX(0.6)}
+    }
+
+    /* floating cards */
+    .card{
+      position:absolute;right:18px;top:28px;width:220px;height:120px;border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      padding:12px;display:flex;flex-direction:column;gap:8px;backdrop-filter: blur(6px);
+      transform: translateZ(40px);
+      box-shadow: 0 12px 40px rgba(2,6,23,0.6);
+    }
+    .badge{
+      display:inline-block;padding:6px 10px;border-radius:999px;font-weight:800;font-size:13px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      color:#fff; width:max-content;
+    }
+
+    /* price explosion (like 270萬) */
+    .price-stamp{
+      position:absolute;left:18px;bottom:22px;
+      background: linear-gradient(90deg,#111216, rgba(124,92,255,0.06));
+      padding:12px 18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 16px 48px rgba(12,8,30,0.7);
+      transform:translateZ(60px);
+    }
+    .price-stamp h3{margin:0;font-size:20px;line-height:1;color:var(--gold);font-weight:900;letter-spacing:0.01em}
+    .price-stamp p{margin:4px 0 0 0;font-size:12px;color:rgba(255,255,255,0.72)}
+
+    /* hero-right small caption */
+    .mock-caption{
+      margin-top:10px;font-size:13px;color:rgba(255,255,255,0.6);
+    }
+
+    /* features section */
+    .features{
+      padding:36px;
+      display:flex;
+      gap:18px;
+      align-items:stretch;
+      justify-content:center;
+    }
+    .feature{
+      background:var(--glass);
+      border-radius:12px;padding:18px;width:260px;
+      border:1px solid var(--glass-2);
+      box-shadow: 0 12px 40px rgba(2,6,23,0.5);
+      text-align:left;
+    }
+    .feature h4{margin:0 0 8px 0}
+    .feature p{margin:0;color:rgba(255,255,255,0.7);font-size:14px}
+
+    /* responsive */
+    @media (max-width:1000px){
+      .hero{grid-template-columns:1fr; padding:24px}
+      .hero-left{order:2;padding:8px 0 28px}
+      .mockup{order:1; height:360px}
+      .mock-right{display:none}
+      p.lead{max-width:100%}
+      .device{width:92%;height:320px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">
+        <div class="mark">UI</div>
+        <div>
+          <div style="font-weight:700;font-size:15px">UIUX Studio</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.45)">Design & Motion</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="#works">作品</a>
+        <a href="#courses">課程</a>
+        <a href="#pricing">價格</a>
+        <a href="#contact">聯絡</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-left">
+          <div class="eyebrow">限時領取 · UIUX 網頁設計課程</div>
+          <h1>網頁設計 + 動畫交付<br>為團隊打造高轉換首頁</h1>
+          <p class="lead">我們把互動、動態與品牌視覺結合 — 從視差動畫到場景控制，一條龍的網頁設計交付。案例含：產品介紹頁、3D 視覺模擬、互動式 CTA。</p>
+
+          <div class="ctas">
+            <button class="btn btn-primary" id="cta">立即領取課程</button>
+            <button class="btn btn-ghost">觀看案例</button>
+            <div style="margin-left:8px;color:rgba(255,255,255,0.6);font-size:13px">限時下架後不回補</div>
+          </div>
+
+          <div style="height:20px"></div>
+
+          <!-- small stats -->
+          <div style="display:flex;gap:18px;margin-top:12px">
+            <div style="background:var(--glass);padding:10px;border-radius:10px;border:1px solid var(--glass-2);min-width:110px;text-align:center">
+              <div style="font-weight:800;font-size:18px">4,412</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.6)">追蹤</div>
+            </div>
+            <div style="background:var(--glass);padding:10px;border-radius:10px;border:1px solid var(--glass-2);min-width:110px;text-align:center">
+              <div style="font-weight:800;font-size:18px">270k</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.6)">網頁估價</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="hero-right mockup">
+          <div class="device" id="device" aria-hidden="true">
+            <div class="screen">
+              <!-- top nav on screen -->
+              <div style="display:flex;align-items:center;gap:10px;z-index:3">
+                <div style="width:36px;height:8px;background:rgba(255,255,255,0.06);border-radius:6px"></div>
+                <div style="width:120px;height:8px;background:rgba(255,255,255,0.04);border-radius:6px"></div>
+                <div style="margin-left:auto;width:42px;height:12px;background:linear-gradient(90deg,var(--accent1),var(--accent2));border-radius:8px"></div>
+              </div>
+
+              <!-- center canvas imitation -->
+              <div style="position:relative;flex:1;display:flex;align-items:center;justify-content:center">
+                <div class="beam" id="beam"></div>
+
+                <!-- faux 3D scene: a glowing "road" element -->
+                <svg width="100%" height="100%" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid meet" style="display:block">
+                  <defs>
+                    <linearGradient id="g1" x1="0" x2="1">
+                      <stop offset="0" stop-color="#fff" stop-opacity="0.9"/>
+                      <stop offset="0.5" stop-color="#7C5CFF" stop-opacity="0.12"/>
+                      <stop offset="1" stop-color="#00E5A8" stop-opacity="0.06"/>
+                    </linearGradient>
+                    <filter id="f1" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="18" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                  </defs>
+
+                  <!-- horizon glow -->
+                  <rect x="0" y="0" width="800" height="360" fill="url(#g1)" opacity="0.03"/>
+                  <g id="road" filter="url(#f1)">
+                    <!-- converging lines -->
+                    <path d="M160 260 L400 40 L640 260" stroke="#ffffff" stroke-opacity="0.06" stroke-width="6" fill="none"></path>
+                    <!-- center streaks -->
+                    <g id="streaks" stroke="#fff" stroke-width="2" stroke-opacity="0.9">
+                      <path d="M400 70 L400 300" stroke-opacity=".18"/>
+                      <path d="M360 120 L400 180" stroke-opacity=".12"/>
+                      <path d="M440 120 L400 180" stroke-opacity=".12"/>
+                    </g>
+                  </g>
+                </svg>
+
+              </div>
+
+              <!-- footer (small controls) -->
+              <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+                <div style="display:flex;gap:8px;align-items:center">
+                  <div style="width:10px;height:10px;border-radius:3px;background:rgba(255,255,255,0.06)"></div>
+                  <div style="width:56px;height:6px;background:rgba(255,255,255,0.03);border-radius:4px"></div>
+                </div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.5)">Preview · UIUX滑鼠偵測</div>
+              </div>
+            </div>
+
+            <!-- floating card and price -->
+            <div class="card" style="right:34px;top:22px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:48px;height:48;border-radius:10px;background:linear-gradient(90deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#03121a">A</div>
+                <div>
+                  <div style="font-weight:800">Huly — Landing</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,0.65)">Brand & Motion</div>
+                </div>
+              </div>
+              <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:13px;color:rgba(255,255,255,0.75)">我們收取</div>
+                <div style="font-weight:900;font-size:16px;color:var(--gold)">US$ 89,775</div>
+              </div>
+            </div>
+
+            <div class="price-stamp">
+              <h3>網頁設計 270 萬</h3>
+              <p>完整 UI / 動畫 / 交付</p>
+            </div>
+
+            <div class="track" aria-hidden="true">
+              <div class="line l1"></div>
+              <div class="line l2"></div>
+              <div class="line l3"></div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <section class="features" id="courses">
+        <div class="feature">
+          <h4>互動式視差</h4>
+          <p>滑動與鼠標驅動的視差層級，讓頁面有深度感與導流效果。</p>
+        </div>
+        <div class="feature">
+          <h4>3D 場景模擬</h4>
+          <p>使用 SVG / Canvas 或 Three.js 製作可控場景動畫，提供視覺焦點。</p>
+        </div>
+        <div class="feature">
+          <h4>轉換優化 CTA</h4>
+          <p>動態 CTA 與 A/B 測試樣式，提升點擊率與報名率。</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // 微互動：移動裝置視差 (滑鼠傾斜)
+    const device = document.getElementById('device');
+    const beam = document.getElementById('beam');
+    let rect = device.getBoundingClientRect();
+
+    function onMove(e){
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) - (rect.left + rect.width/2);
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) - (rect.top + rect.height/2);
+      const rx = (-y / rect.height) * 10;
+      const ry = (x / rect.width) * 12;
+      device.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
+      // move beam slightly for parallax
+      beam.style.left = `${50 + ry*0.8}%`;
+      beam.style.top = `${20 + rx*0.6}%`;
+    }
+
+    function reset(){
+      device.style.transform = '';
+      beam.style.left = '50%';
+      beam.style.top = '20%';
+    }
+
+    function bindEvents(){
+      rect = device.getBoundingClientRect();
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('touchmove', onMove, {passive:true});
+      window.addEventListener('mouseleave', reset);
+      window.addEventListener('touchend', reset);
+      // CTA pulse effect
+      const cta = document.getElementById('cta');
+      cta.addEventListener('click', ()=> {
+        cta.innerText = '已領取 ✓';
+        cta.disabled = true;
+        cta.style.opacity = 0.95;
+        cta.style.transform = 'scale(.99)';
+      });
+    }
+
+    // small intro animation
+    function intro(){
+      device.style.transform = 'translateY(10px) rotateX(4deg) rotateY(-6deg)'; // initial pose
+      setTimeout(()=> device.style.transition = 'transform 800ms cubic-bezier(.16,.9,.32,1)',100);
+    }
+
+    bindEvents();
+    intro();
+
+    // accessibility: reduce motion respect (simple)
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mq.matches){
+      document.querySelectorAll('*').forEach(n=> n.style.transitionDuration = '0ms');
+    }
+
+  </script>
+</body>
+</html>
